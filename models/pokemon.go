@@ -6,8 +6,14 @@ type PokemonPool struct {
 	ID       primitive.ObjectID `bson:"_id,omitempty"`
 	Nome     string             `bson:"nome"`
 	Tipos    []string           `bson:"tipos"`
+	Ataques  []AtaquesPool      `bson:"ataques"`
 	Raridade string             `bson:"raridade"`
 	URL      string             `bson:"url"`
+}
+
+type AtaquesPool struct {
+	Nome string `bson:"nome"`
+	Tipo string `bson:"tipo"`
 }
 
 type PokemonScore struct {

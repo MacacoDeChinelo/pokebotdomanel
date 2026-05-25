@@ -2,9 +2,8 @@ package database
 
 import (
 	"context"
-	"time"
-
 	"pokebot/models"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -42,6 +41,16 @@ func GetRandomPokemon() (*models.PokemonPool, error) {
 		return nil, err
 	}
 	return &pokemons[0], nil
+}
+
+func GetPokemon(name string) (*models.PokemonPool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"nome": name}
+	var pokemon models.PokemonPool
+	err := DB.Collection("pokemon_pool").FindOne(ctx, filter).Decode(&pokemon)
+	return &pokemon, err
 }
 
 func GetDailyScore(serverID, userID, date string) (*models.PokemonScore, error) {
