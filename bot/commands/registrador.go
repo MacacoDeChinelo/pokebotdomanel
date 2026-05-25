@@ -10,7 +10,7 @@ func RegisterSlashCommands(s *discordgo.Session) { //, guildID string) {
 
 	commands := []*discordgo.ApplicationCommand{
 		{
-			Name:        "batalhar",
+			Name:        "pokebattle",
 			Description: "Batalhe contra outro treinador!",
 			Options: []*discordgo.ApplicationCommandOption{
 				{
@@ -22,11 +22,11 @@ func RegisterSlashCommands(s *discordgo.Session) { //, guildID string) {
 			},
 		},
 		{
-			Name:        "placar",
+			Name:        "pokeplacar",
 			Description: "Veja o placar de batalhas!",
 		},
 		{
-			Name:        "sortear",
+			Name:        "pokemon",
 			Description: "Sorteia Pokémons diários para o servidor",
 		},
 	}

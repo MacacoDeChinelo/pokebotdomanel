@@ -26,7 +26,7 @@ func main() {
 
 	dg.AddHandler(bot.OnGuildCreateHandler)
 
-	dg.AddHandler(bot.OnSlashCommandCreate)
+	dg.AddHandler(bot.OnSlashCommandCreateHandler)
 
 	if err = dg.Open(); err != nil {
 		log.Fatal("Erro ao abrir conexão com o Discord:", err)

@@ -22,12 +22,12 @@ func MessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	command := strings.ToLower(args[0])
 
 	switch command {
-	case "!sortear":
-		commands.HandleSortear(s, m)
-	case "!batalhar":
-		commands.HandleBatalhar(s, m, args)
-	case "!placar":
-		commands.HandlePlacar(s, m)
+	case "!pokemon":
+		commands.HandlePokemon(s, m)
+	case "!pokebattle":
+		commands.HandlePokebattle(s, m, args)
+	case "!pokeplacar":
+		commands.HandlePokeplacar(s, m)
 	}
 }
 
@@ -50,7 +50,7 @@ func OnGuildCreateHandler(s *discordgo.Session, g *discordgo.GuildCreate) {
 	}
 }
 
-func OnSlashCommandCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func OnSlashCommandCreateHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	if i.Type != discordgo.InteractionApplicationCommand {
 		return
@@ -60,11 +60,11 @@ func OnSlashCommandCreate(s *discordgo.Session, i *discordgo.InteractionCreate) 
 
 	switch data.Name {
 
-	case "batalhar":
-		commands.HandleBatalharSlash(s, i)
-	case "placar":
-		commands.HandlePlacarSlash(s, i)
-	case "sortear":
-		commands.HandleSortearSlash(s, i)
+	case "pokebattle":
+		commands.HandlePokebattleSlash(s, i)
+	case "pokeplacar":
+		commands.HandlePokeplacarSlash(s, i)
+	case "pokemon":
+		commands.HandlePokemonSlash(s, i)
 	}
 }

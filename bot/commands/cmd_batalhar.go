@@ -16,9 +16,9 @@ var (
 	cdMutex   sync.Mutex
 )
 
-func HandleBatalhar(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
+func HandlePokebattle(s *discordgo.Session, m *discordgo.MessageCreate, args []string) {
 	if len(m.Mentions) == 0 {
-		s.ChannelMessageSend(m.ChannelID, "Mencione o treinador que deseja batalhar! Ex: `!batalhar @usuario`")
+		s.ChannelMessageSend(m.ChannelID, "Mencione o treinador que deseja batalhar! Ex: `!pokebattle @usuario`")
 		return
 	}
 	target := m.Mentions[0]
@@ -89,7 +89,7 @@ func hit(raridade string) int {
 	return rand.Intn(10) + 1 // 1 a 10
 }
 
-func HandleBatalharSlash(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func HandlePokebattleSlash(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	// =========================
 	// VALIDAÇÕES

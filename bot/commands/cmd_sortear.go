@@ -11,7 +11,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandleSortear(s *discordgo.Session, m *discordgo.MessageCreate) {
+func HandlePokemon(s *discordgo.Session, m *discordgo.MessageCreate) {
 	hoje := time.Now().Format("2006-01-02")
 
 	// Verifica se o usuário que chamou já tem um sorteio hoje
@@ -82,7 +82,7 @@ func HandleSortear(s *discordgo.Session, m *discordgo.MessageCreate) {
 	s.ChannelMessageSendEmbed(m.ChannelID, embed)
 }
 
-func HandleSortearSlash(s *discordgo.Session, interaction *discordgo.InteractionCreate) {
+func HandlePokemonSlash(s *discordgo.Session, interaction *discordgo.InteractionCreate) {
 
 	hoje := time.Now().Format("2006-01-02")
 

@@ -10,7 +10,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
-func HandlePlacar(s *discordgo.Session, m *discordgo.MessageCreate) {
+func HandlePokeplacar(s *discordgo.Session, m *discordgo.MessageCreate) {
 	hoje := time.Now().Format("2006-01-02")
 	scores, err := database.GetServerDailyLeaderboard(m.GuildID, hoje)
 	if err != nil || len(scores) == 0 {
@@ -76,7 +76,7 @@ func HandlePlacar(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 }
 
-func HandlePlacarSlash(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func HandlePokeplacarSlash(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	hoje := time.Now().Format("2006-01-02")
 
