@@ -82,8 +82,9 @@ func HandlePokebattle(s *discordgo.Session, m *discordgo.MessageCreate, args []s
 	s.ChannelMessageSendEmbed(m.ChannelID, embed)
 }
 
+// normal 🟢 raro 🟨 e lendário 🔶
 func hit(raridade string) int {
-	if raridade == "legendary" {
+	if raridade == "legendary 🔶" {
 		return rand.Intn(6) + 5 // 5 a 10
 	}
 	return rand.Intn(10) + 1 // 1 a 10
