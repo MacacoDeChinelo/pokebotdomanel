@@ -1,5 +1,7 @@
 package commands
 
+import "github.com/bwmarrin/discordgo"
+
 var typeChart = map[string]struct {
 	weakTo      []string
 	resistantTo []string
@@ -131,4 +133,30 @@ func getMultiplier(attack string, defenderType string) float64 {
 	}
 
 	return 1
+}
+
+// GetCommands retorna todos os slash commands do módulo de Pokémon
+func GetCommands() []*discordgo.ApplicationCommand {
+	return []*discordgo.ApplicationCommand{
+		{
+			Name:        "pokebattle",
+			Description: "Batalhe contra outro treinador!",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionUser,
+					Name:        "oponente",
+					Description: "Usuário que você quer desafiar",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name:        "pokeplacar",
+			Description: "Veja o placar de batalhas!",
+		},
+		{
+			Name:        "pokemon",
+			Description: "Sorteia Pokémons diários para o servidor",
+		},
+	}
 }

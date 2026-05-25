@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"pokebot/bot/commands"
+	commands "pokebot/bot/commands/pokemon"
 
 	"github.com/bwmarrin/discordgo"
 )
