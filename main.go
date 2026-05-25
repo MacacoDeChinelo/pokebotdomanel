@@ -32,7 +32,7 @@ func main() {
 		log.Fatal("Erro ao abrir conexão com o Discord:", err)
 	}
 
-	fmt.Println("Bot Pokémon está rodando! Pressione CTRL-C para sair.")
+	fmt.Println("Darth Verde está pronto! Pressione CTRL-C para sair.")
 	// Registra os comandos de barra
 	commands.RegisterSlashCommands(dg) // Registra os comandos de barra
 	// Verifica os servidores atuais
