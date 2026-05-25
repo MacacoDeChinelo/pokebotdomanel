@@ -49,3 +49,22 @@ func OnGuildCreateHandler(s *discordgo.Session, g *discordgo.GuildCreate) {
 		fmt.Println("Erro ao sair do servidor:", err)
 	}
 }
+
+func OnSlashCommandCreate(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+	if i.Type != discordgo.InteractionApplicationCommand {
+		return
+	}
+
+	data := i.ApplicationCommandData()
+
+	switch data.Name {
+
+	case "batalhar":
+		commands.HandleBatalharSlash(s, i)
+	case "placar":
+		commands.HandlePlacarSlash(s, i)
+	case "sortear":
+		commands.HandleSortearSlash(s, i)
+	}
+}

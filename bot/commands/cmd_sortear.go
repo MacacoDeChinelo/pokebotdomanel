@@ -81,3 +81,94 @@ func HandleSortear(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	s.ChannelMessageSendEmbed(m.ChannelID, embed)
 }
+
+func HandleSortearSlash(s *discordgo.Session, interaction *discordgo.InteractionCreate) {
+
+	hoje := time.Now().Format("2006-01-02")
+
+	// resposta inicial obrigatória (evita timeout de 3s)
+	s.InteractionRespond(interaction.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+	})
+
+	// verifica se o usuário já tem score hoje
+	userScore, err := database.GetDailyScore(interaction.GuildID, interaction.Member.User.ID, hoje)
+
+	if err != nil {
+
+		members, err := s.GuildMembers(interaction.GuildID, "", 1000)
+		if err != nil {
+			s.FollowupMessageCreate(interaction.Interaction, false, &discordgo.WebhookParams{
+				Content: "Erro ao buscar membros do servidor.",
+			})
+			return
+		}
+
+		for _, member := range members {
+
+			if member.User.Bot {
+				continue
+			}
+
+			_, errCheck := database.GetDailyScore(interaction.GuildID, member.User.ID, hoje)
+
+			if errCheck != nil {
+
+				pool, errPool := database.GetRandomPokemon()
+				if errPool != nil {
+					continue
+				}
+
+				power := 0
+				if pool.Raridade == "normal" {
+					power = rand.Intn(30) + 1
+				} else {
+					power = rand.Intn(21) + 20
+				}
+
+				newScore := &models.PokemonScore{
+					DataSorteio: hoje,
+					ServerID:    interaction.GuildID,
+					UserID:      member.User.ID,
+					Pokemon:     pool.Nome,
+					Raridade:    pool.Raridade,
+					Power:       power,
+					Vitorias:    0,
+					Derrotas:    0,
+					URL:         pool.URL,
+				}
+
+				database.SaveDailyScore(newScore)
+
+				if member.User.ID == interaction.Member.User.ID {
+					userScore = newScore
+				}
+			}
+		}
+	}
+
+	// fallback de segurança
+	if userScore == nil {
+		s.FollowupMessageCreate(interaction.Interaction, false, &discordgo.WebhookParams{
+			Content: "Ocorreu um erro ao buscar seu Pokémon.",
+		})
+		return
+	}
+
+	// embed final
+	embed := &discordgo.MessageEmbed{
+		Title:       "🎉 Seu Pokémon Diário!",
+		Description: fmt.Sprintf("<@%s>, você tirou um **%s**!", interaction.Member.User.ID, userScore.Pokemon),
+		Color:       0x00ff00,
+		Fields: []*discordgo.MessageEmbedField{
+			{Name: "Raridade", Value: userScore.Raridade, Inline: true},
+			{Name: "Power", Value: fmt.Sprintf("%d", userScore.Power), Inline: true},
+			{Name: "Vitórias / Derrotas", Value: fmt.Sprintf("%d / %d", userScore.Vitorias, userScore.Derrotas), Inline: false},
+		},
+		Image: &discordgo.MessageEmbedImage{URL: userScore.URL},
+	}
+
+	s.FollowupMessageCreate(interaction.Interaction, false, &discordgo.WebhookParams{
+		Embeds: []*discordgo.MessageEmbed{embed},
+	})
+}

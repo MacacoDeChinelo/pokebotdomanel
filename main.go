@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"pokebot/bot/commands"
 	bot "pokebot/bot/handlers"
 	"pokebot/utils"
 
@@ -16,7 +17,7 @@ import (
 func main() {
 	var err error
 
-	_, dg := utils.Init() // função que inicializa o banco de dados e retorna a sessão do Discord
+	dg := utils.Init() // função que inicializa o banco de dados e retorna a sessão do Discord
 
 	// Intents necessários, incluindo GuildMembers para o sorteio varrer o server
 	dg.Identify.Intents = discordgo.IntentsAll //discordgo.IntentsGuilds | discordgo.IntentsGuildMessages | discordgo.IntentsGuildMembers
@@ -25,11 +26,15 @@ func main() {
 
 	dg.AddHandler(bot.OnGuildCreateHandler)
 
+	dg.AddHandler(bot.OnSlashCommandCreate)
+
 	if err = dg.Open(); err != nil {
 		log.Fatal("Erro ao abrir conexão com o Discord:", err)
 	}
 
 	fmt.Println("Bot Pokémon está rodando! Pressione CTRL-C para sair.")
+	// Registra os comandos de barra
+	commands.RegisterSlashCommands(dg) // Registra os comandos de barra
 	// Verifica os servidores atuais
 	bot.CheckGuilds(dg)
 	sc := make(chan os.Signal, 1)

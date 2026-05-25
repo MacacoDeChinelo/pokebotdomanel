@@ -88,3 +88,287 @@ func hit(raridade string) int {
 	}
 	return rand.Intn(10) + 1 // 1 a 10
 }
+
+func HandleBatalharSlash(s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+	// =========================
+	// VALIDAÇÕES
+	// =========================
+	if i.Member == nil || i.Member.User == nil {
+		return
+	}
+
+	options := i.ApplicationCommandData().Options
+
+	if len(options) == 0 {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Escolha um oponente para batalhar.",
+			},
+		})
+		return
+	}
+
+	target := options[0].UserValue(s)
+
+	if target == nil {
+		return
+	}
+
+	if target.ID == i.Member.User.ID || target.Bot {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Você não pode batalhar consigo mesmo ou contra bots.",
+			},
+		})
+		return
+	}
+
+	// =========================
+	// COOLDOWN
+	// =========================
+	cdMutex.Lock()
+
+	if lastUse, exists := cooldowns[i.Member.User.ID]; exists {
+
+		if time.Since(lastUse) < 10*time.Minute {
+
+			faltam := (10 * time.Minute) - time.Since(lastUse)
+
+			cdMutex.Unlock()
+
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: fmt.Sprintf(
+						"⏳ Seu Pokémon está no Centro Pokémon curando.\nAguarde %d minutos.",
+						int(faltam.Minutes()),
+					),
+				},
+			})
+
+			return
+		}
+	}
+
+	cooldowns[i.Member.User.ID] = time.Now()
+
+	cdMutex.Unlock()
+
+	// =========================
+	// BUSCA POKÉMONS
+	// =========================
+	hoje := time.Now().Format("2006-01-02")
+
+	p1, err1 := database.GetDailyScore(
+		i.GuildID,
+		i.Member.User.ID,
+		hoje,
+	)
+
+	p2, err2 := database.GetDailyScore(
+		i.GuildID,
+		target.ID,
+		hoje,
+	)
+
+	if err1 != nil || err2 != nil || p1 == nil || p2 == nil {
+
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Ambos os jogadores precisam usar `/sortear` antes da batalha.",
+			},
+		})
+
+		return
+	}
+
+	// =========================
+	// RESPOSTA INICIAL
+	// =========================
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+	})
+
+	// =========================
+	// HP BASE
+	// =========================
+	hp1 := p1.Power * 10
+	hp2 := p2.Power * 10
+
+	winner := p1
+	loser := p2
+
+	// =========================
+	// MENSAGEM INICIAL
+	// =========================
+	s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+		Content: fmt.Sprintf(
+			"⚔️ **%s** VS **%s** ⚔️\n🔥 A batalha começou!",
+			p1.Pokemon,
+			p2.Pokemon,
+		),
+	})
+
+	time.Sleep(2 * time.Second)
+
+	// =========================
+	// LOOP DE BATALHA
+	// =========================
+	turn := 1
+
+	for hp1 > 0 && hp2 > 0 {
+
+		// =====================
+		// P1 ATACA
+		// =====================
+		damage1 := hit(p1.Raridade)
+
+		critical1 := rand.Intn(100) < 20
+
+		if critical1 {
+			damage1 *= 2
+		}
+
+		hp2 -= damage1
+
+		if hp2 < 0 {
+			hp2 = 0
+		}
+
+		msg1 := fmt.Sprintf(
+			"🎯 **Turno %d**\n\n⚡ **%s** atacou **%s**!\n💥 Dano: **%d**",
+			turn,
+			p1.Pokemon,
+			p2.Pokemon,
+			damage1,
+		)
+
+		if critical1 {
+			msg1 += "\n✨ **ATAQUE CRÍTICO!**"
+		}
+
+		msg1 += fmt.Sprintf(
+			"\n❤️ HP %s: **%d**",
+			p2.Pokemon,
+			hp2,
+		)
+
+		s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+			Content: msg1,
+		})
+
+		time.Sleep(2 * time.Second)
+
+		if hp2 <= 0 {
+			winner = p1
+			loser = p2
+			break
+		}
+
+		// =====================
+		// P2 ATACA
+		// =====================
+		dodge := rand.Intn(100) < 15
+
+		if dodge {
+
+			s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+				Content: fmt.Sprintf(
+					"💨 **%s desviou do ataque de %s!**",
+					p1.Pokemon,
+					p2.Pokemon,
+				),
+			})
+
+			time.Sleep(2 * time.Second)
+
+		} else {
+
+			damage2 := hit(p2.Raridade)
+
+			critical2 := rand.Intn(100) < 20
+
+			if critical2 {
+				damage2 *= 2
+			}
+
+			hp1 -= damage2
+
+			if hp1 < 0 {
+				hp1 = 0
+			}
+
+			msg2 := fmt.Sprintf(
+				"🎯 **Turno %d**\n\n🔥 **%s** atacou **%s**!\n💥 Dano: **%d**",
+				turn,
+				p2.Pokemon,
+				p1.Pokemon,
+				damage2,
+			)
+
+			if critical2 {
+				msg2 += "\n✨ **ATAQUE CRÍTICO!**"
+			}
+
+			msg2 += fmt.Sprintf(
+				"\n❤️ HP %s: **%d**",
+				p1.Pokemon,
+				hp1,
+			)
+
+			s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+				Content: msg2,
+			})
+
+			time.Sleep(2 * time.Second)
+
+			if hp1 <= 0 {
+				winner = p2
+				loser = p1
+				break
+			}
+		}
+
+		turn++
+	}
+
+	// =========================
+	// RESULTADO FINAL
+	// =========================
+	database.UpdateBattleResult(winner.ID, loser.ID)
+
+	embed := &discordgo.MessageEmbed{
+		Title: "🏆 Resultado da Batalha!",
+		Description: fmt.Sprintf(
+			"⚔️ **%s** venceu a batalha contra **%s**!",
+			winner.Pokemon,
+			loser.Pokemon,
+		),
+		Color: 0x00ff00,
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "Treinador vencedor",
+				Value:  fmt.Sprintf("<@%s>", winner.UserID),
+				Inline: false,
+			},
+			{
+				Name:   "Recompensa",
+				Value:  "+1 Power",
+				Inline: false,
+			},
+		},
+		Image: &discordgo.MessageEmbedImage{
+			URL: winner.URL,
+		},
+	}
+
+	s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+		Embeds: []*discordgo.MessageEmbed{
+			embed,
+		},
+	})
+}
