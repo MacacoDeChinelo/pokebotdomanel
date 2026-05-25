@@ -21,9 +21,9 @@ func Init() (session *discordgo.Session) {
 
 	//fmt.Println(mongoURI)
 	if err := database.Connect(mongoURI); err != nil {
-		log.Fatal("Erro ao conectar no MongoDB:", err)
+		log.Fatal("Erro ao conectar na base de dados:", err)
 	}
-	fmt.Println("Conectado ao MongoDB!")
+	fmt.Println("Conectado à base de dados!")
 
 	token := os.Getenv("DISCORD_TOKEN")
 
