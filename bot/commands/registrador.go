@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	pokemon "pokebot/bot/commands/pokemon"
+	"pokebot/bot/commands/youtube"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -11,7 +12,7 @@ func RegisterSlashCommands(s *discordgo.Session) {
 	// Agrupa todos os módulos em um slice de slices
 	commandGroups := [][]*discordgo.ApplicationCommand{
 		pokemon.GetCommands(),
-		//admin.GetCommands(),
+		youtube.GetCommands(),
 		// Adicione novos módulos aqui no futuro (ex: economia.GetCommands(), musica.GetCommands())
 	}
 

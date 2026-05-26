@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"log"
 	"pokebot/models"
 	"time"
 
@@ -103,4 +104,67 @@ func GetServerDailyLeaderboard(serverID, date string) ([]models.PokemonScore, er
 		return nil, err
 	}
 	return scores, nil
+}
+
+func InsertYouTubeAlert(ctx context.Context, alerta models.YouTubeAlert) error {
+	// Acessando a collection streamer_alerts dentro do banco BotPokemon [cite: 8, 76]
+	// Substitua 'MongoClient' pela sua variável real de conexão com o MongoDB
+	collection := DB.Collection("streamer_alerts")
+
+	_, err := collection.InsertOne(ctx, alerta)
+	if err != nil {
+		log.Printf("Erro ao inserir configuração de alerta do YouTube: %v", err)
+		return err
+	}
+
+	return nil
+}
+
+func GetAllYouTubeAlerts(ctx context.Context) ([]models.YouTubeAlert, error) {
+	var alertas []models.YouTubeAlert
+
+	collection := DB.Collection("streamer_alerts")
+
+	// Usamos bson.M{} vazio para buscar todos os documentos da collection
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Printf("Erro ao buscar alertas do YouTube no banco: %v", err)
+		return nil, err
+	}
+
+	// É boa prática garantir que o cursor seja fechado ao final da operação
+	defer cursor.Close(ctx)
+
+	// O método All itera sobre o cursor e decodifica tudo direto no slice 'alertas'
+	if err = cursor.All(ctx, &alertas); err != nil {
+		log.Printf("Erro ao decodificar os alertas do YouTube: %v", err)
+		return nil, err
+	}
+
+	return alertas, nil
+}
+
+// UpdateLiveStatus altera a flag is_live de um alerta específico no MongoDB
+func UpdateLiveStatus(ctx context.Context, id primitive.ObjectID, isLive bool) error {
+	// Acessando a collection streamer_alerts dentro do banco BotPokemon
+	collection := DB.Collection("streamer_alerts")
+
+	// Filtro: busca o documento exatamente pelo ID (ObjectID gerado pelo Mongo)
+	filter := bson.M{"_id": id}
+
+	// Operação: utiliza o operador $set para alterar apenas o campo is_live
+	update := bson.M{
+		"$set": bson.M{
+			"is_live": isLive,
+		},
+	}
+
+	// Executa a atualização de um único documento
+	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Printf("Erro ao atualizar o status de live no banco de dados para o ID %s: %v", id.Hex(), err)
+		return err
+	}
+
+	return nil
 }

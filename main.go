@@ -8,6 +8,7 @@ import (
 	"syscall"
 
 	"pokebot/bot/commands"
+	"pokebot/bot/commands/youtube"
 	bot "pokebot/bot/handlers"
 	"pokebot/utils"
 
@@ -37,6 +38,7 @@ func main() {
 	commands.RegisterSlashCommands(dg) // Registra os comandos de barra
 	// Verifica os servidores atuais
 	bot.CheckGuilds(dg)
+	youtube.StartYouTubeMonitor(dg)
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
