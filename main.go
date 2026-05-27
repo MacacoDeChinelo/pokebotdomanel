@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"pokebot/bot/commands"
-	"pokebot/bot/commands/youtube"
 	bot "pokebot/bot/handlers"
+	commands "pokebot/bot/modules"
+	"pokebot/bot/modules/youtube"
 	"pokebot/utils"
 
 	"github.com/bwmarrin/discordgo"

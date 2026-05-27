@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
-	pokemon "pokebot/bot/commands/pokemon"
-	"pokebot/bot/commands/youtube"
+	pokemon "pokebot/bot/modules/pokemon"
+	"pokebot/bot/modules/youtube"
 
 	"github.com/bwmarrin/discordgo"
 )

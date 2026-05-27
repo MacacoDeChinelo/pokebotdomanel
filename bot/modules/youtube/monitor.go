@@ -18,7 +18,7 @@ import (
 func StartYouTubeMonitor(s *discordgo.Session) {
 	fmt.Println("Iniciando monitoramento de lives do YouTube...")
 	// Cria um Ticker para rodar a cada 5 minutos
-	ticker := time.NewTicker(5 * time.Minute)
+	ticker := time.NewTicker(5 * time.Second)
 
 	go func() {
 		for range ticker.C {
@@ -79,7 +79,7 @@ func checkYouTubeLives(s *discordgo.Session) {
 		// 7. Envio de mensagens e atualização do banco
 		if isLiveNow && !alerta.IsLive {
 			// Entrou em live agora! Envia a mensagem.
-			mensagem := fmt.Sprintf("<@&%s> 🔴 **LIVE ON!**\nO canal está ao vivo no YouTube! Vem assistir: https://www.youtube.com/channel/%s/live", alerta.RoleToMention, alerta.YouTubeChannel)
+			mensagem := fmt.Sprintf("<@&%s> 🔴 **LIVE ON!**\nCola no youtube e vem me assistir: https://www.youtube.com/channel/%s/live", alerta.RoleToMention, alerta.YouTubeChannel)
 
 			_, err := s.ChannelMessageSend(alerta.DiscordChannel, mensagem)
 			if err != nil {
