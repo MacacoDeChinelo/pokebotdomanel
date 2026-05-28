@@ -6,24 +6,15 @@ import (
 	"pokebot/models"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 var DB *mongo.Database
 
-func Connect(uri string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+func InitDB(db *mongo.Database) {
+	DB = db
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
-	if err != nil {
-		return err
-	}
-	DB = client.Database("BotPokemon")
-	return nil
 }
 
 func GetRandomPokemon() (*models.PokemonPool, error) {
@@ -72,7 +63,7 @@ func SaveDailyScore(score *models.PokemonScore) error {
 	return err
 }
 
-func UpdateBattleResult(winnerID, loserID primitive.ObjectID) {
+func UpdateBattleResult(winnerID, loserID bson.ObjectID) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -145,7 +136,7 @@ func GetAllYouTubeAlerts(ctx context.Context) ([]models.YouTubeAlert, error) {
 }
 
 // UpdateLiveStatus altera a flag is_live de um alerta específico no MongoDB
-func UpdateLiveStatus(ctx context.Context, id primitive.ObjectID, isLive bool) error {
+func UpdateLiveStatus(ctx context.Context, id bson.ObjectID, isLive bool) error {
 	// Acessando a collection streamer_alerts dentro do banco BotPokemon
 	collection := DB.Collection("streamer_alerts")
 

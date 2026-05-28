@@ -7,18 +7,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"pokebot/database"
+	"pokebot/utils"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	libdatabase "github.com/jolealpe89/readconf/pkg/database"
 	// importe seus models e database
 )
 
 func StartYouTubeMonitor(s *discordgo.Session) {
 	fmt.Println("Iniciando monitoramento de lives do YouTube...")
 	// Cria um Ticker para rodar a cada 5 minutos
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(5 * time.Minute)
 
 	go func() {
 		for range ticker.C {
@@ -38,7 +39,8 @@ type YouTubeSearchResponse struct {
 func checkYouTubeLives(s *discordgo.Session) {
 	fmt.Println("Verificando lives online...")
 	// Pega a chave da API das variáveis de ambiente do seu sistema ou arquivo .env
-	apiKey := os.Getenv("YOUTUBE_API_KEY")
+	apiKeyEncrypt := libdatabase.GetVariable("youtubeApiKey").(string) //os.Getenv("YOUTUBE_API_KEY")
+	apiKey, err := utils.Decrypt(apiKeyEncrypt)
 	if apiKey == "" {
 		log.Println("AVISO: Variável YOUTUBE_API_KEY não está configurada!")
 		return
@@ -74,7 +76,7 @@ func checkYouTubeLives(s *discordgo.Session) {
 		}
 
 		// 6. Lógica de Verificação: Se vieram "Items", significa que tem live acontecendo!
-		isLiveNow := len(ytResp.Items) > 0
+		isLiveNow := true //len(ytResp.Items) > 0
 
 		// 7. Envio de mensagens e atualização do banco
 		if isLiveNow && !alerta.IsLive {
