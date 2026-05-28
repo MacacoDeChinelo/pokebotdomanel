@@ -48,7 +48,7 @@ func Init() (session *discordgo.Session) {
 		log.Fatal("Erro ao conectar na base de dados:", err)
 		return
 	}
-	err = libdatabase.ConnectDBConfig("BotPokemon")
+	err = libdatabase.ConnectDBConfig("BotPokemonTeste")
 	if err != nil {
 		log.Fatal("Erro ao conectar na base BotPokemon:", err)
 		return
