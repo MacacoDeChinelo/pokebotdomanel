@@ -31,9 +31,10 @@ func main() {
 
 	if err = dg.Open(); err != nil {
 		log.Fatal("Erro ao abrir conexão com o Discord:", err)
+		return
 	}
-
-	fmt.Println("Darth Verde está pronto! Pressione CTRL-C para sair.")
+	botName := dg.State.User.Username
+	fmt.Println(botName + " está pronto! Pressione CTRL-C para sair.")
 	// Registra os comandos de barra
 	commands.RegisterSlashCommands(dg) // Registra os comandos de barra
 	// Verifica os servidores atuais

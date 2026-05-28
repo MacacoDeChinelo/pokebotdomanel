@@ -19,7 +19,13 @@ import (
 func StartYouTubeMonitor(s *discordgo.Session) {
 	fmt.Println("Iniciando monitoramento de lives do YouTube...")
 	// Cria um Ticker para rodar a cada 5 minutos
-	ticker := time.NewTicker(5 * time.Minute)
+	minutos := libdatabase.GetVariable("monitorTime").(int32)
+	if minutos < 5 {
+		minutos = 5 // valor padrão de 5 minutos se a variável não estiver configurada corretamente
+		log.Printf("Valor inválido para monitorTime: %d. Usando valor padrão de 5 minutos.\n", minutos)
+	}
+	tempo := time.Duration(minutos) * time.Minute
+	ticker := time.NewTicker(tempo)
 
 	go func() {
 		for range ticker.C {
