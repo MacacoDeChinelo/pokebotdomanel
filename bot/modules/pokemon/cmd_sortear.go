@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"time"
 
-	"pokebot/database"
-	"pokebot/models"
+	"darthverde/database"
+	"darthverde/models"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -128,6 +128,7 @@ func HandlePokemonSlash(s *discordgo.Session, interaction *discordgo.Interaction
 
 				newScore := &models.PokemonScore{
 					DataSorteio: hoje,
+					CriadoEm:    time.Now(),
 					ServerID:    interaction.GuildID,
 					UserID:      member.User.ID,
 					Pokemon:     pool.Nome,

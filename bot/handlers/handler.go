@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	commands "pokebot/bot/modules/pokemon"
-	"pokebot/bot/modules/youtube"
+	commands "darthverde/bot/modules/pokemon"
+	"darthverde/bot/modules/youtube"
 
 	"github.com/bwmarrin/discordgo"
 )

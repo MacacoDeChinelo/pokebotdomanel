@@ -3,16 +3,16 @@ package youtube
 
 import (
 	"context"
+	"darthverde/database"
+	"darthverde/utils"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"pokebot/database"
-	"pokebot/utils"
 	"time"
 
+	libdatabase "github.com/MacacoDeChinelo/readconf/pkg/database"
 	"github.com/bwmarrin/discordgo"
-	libdatabase "github.com/jolealpe89/readconf/pkg/database"
 	// importe seus models e database
 )
 

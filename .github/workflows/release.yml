@@ -1,0 +1,67 @@
+name: Build and Release Bot Golang
+
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+# ==========================================
+# 🛠️ VARIÁVEIS GLOBAIS DE CONFIGURAÇÃO
+# ==========================================
+env:
+  GO_VERSION: '1.25.7'      # Versão do compilador Go
+  BOT_NAME: 'darthverde'        # Nome final do arquivo executável
+  ENTRY_POINT: 'main.go'    # Arquivo principal que inicia o bot
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+
+      - name: Instalar o Golang
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      
+      - name: Configurar Git para repositórios privados
+        run: git config --global url."https://${{ secrets.PRIVATE_REPO_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
+      - name: Avisar o Go sobre o repositório privado
+        run: go env -w GOPRIVATE=github.com/MacacoDeChinelo/*
+      
+
+      - name: Baixar dependências
+        run: go mod tidy
+
+      - name: Fazer o Build para Linux
+        env:
+          GOOS: linux
+          GOARCH: amd64
+        # Puxa o nome do bot e o arquivo principal das variáveis
+        run: go build -o ${{ env.BOT_NAME }}-linux ${{ env.ENTRY_POINT }}
+
+      - name: Fazer o Build para Windows
+        env:
+          GOOS: windows
+          GOARCH: amd64
+        run: go build -o ${{ env.BOT_NAME }}-windows.exe ${{ env.ENTRY_POINT }}
+
+      - name: Zipar os arquivos
+        run: |
+          zip ${{ env.BOT_NAME }}-linux.zip ${{ env.BOT_NAME }}-linux
+          zip ${{ env.BOT_NAME }}-windows.zip ${{ env.BOT_NAME }}-windows.exe
+
+      - name: Criar Release no GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v0.0.${{ github.run_number }}"
+          name: "Release v0.0.${{ github.run_number }}"
+          files: |
+            ${{ env.BOT_NAME }}-linux.zip
+            ${{ env.BOT_NAME }}-windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"pokebot/database"
+	"darthverde/database"
 
 	"github.com/bwmarrin/discordgo"
 )

@@ -1,6 +1,10 @@
 package models
 
-import "go.mongodb.org/mongo-driver/v2/bson"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
+)
 
 type PokemonPool struct {
 	ID       bson.ObjectID `bson:"_id,omitempty"`
@@ -19,6 +23,7 @@ type AtaquesPool struct {
 type PokemonScore struct {
 	ID          bson.ObjectID `bson:"_id,omitempty"`
 	DataSorteio string        `bson:"data_sorteio"`
+	CriadoEm    time.Time     `bson:"criado_em"`
 	ServerID    string        `bson:"server_id"`
 	UserID      string        `bson:"user_id"`
 	Pokemon     string        `bson:"pokemon"`

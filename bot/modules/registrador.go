@@ -1,30 +1,35 @@
 package commands
 
 import (
+	pokemon "darthverde/bot/modules/pokemon"
+	"darthverde/bot/modules/youtube"
 	"fmt"
-	pokemon "pokebot/bot/modules/pokemon"
-	"pokebot/bot/modules/youtube"
 
 	"github.com/bwmarrin/discordgo"
 )
 
 func RegisterSlashCommands(s *discordgo.Session) {
+
+	// 1. Cria um slice (array) vazio que vai receber TODOS os comandos
+	var allCommands []*discordgo.ApplicationCommand
 	// Agrupa todos os módulos em um slice de slices
 	commandGroups := [][]*discordgo.ApplicationCommand{
 		pokemon.GetCommands(),
 		youtube.GetCommands(),
 		// Adicione novos módulos aqui no futuro (ex: economia.GetCommands(), musica.GetCommands())
 	}
-
-	// Percorre os grupos e registra cada comando
+	// 3. Junta tudo dentro do nosso array único 'allCommands'
 	for _, group := range commandGroups {
-		for _, cmd := range group {
-			_, err := s.ApplicationCommandCreate(s.State.User.ID, "", cmd)
-			if err != nil {
-				fmt.Printf("Erro ao criar comando '%s': %v\n", cmd.Name, err)
-			} else {
-				fmt.Printf("Comando '%s' registrado com sucesso!\n", cmd.Name)
-			}
-		}
+		allCommands = append(allCommands, group...)
+	}
+	// Percorre os grupos e registra cada comando
+	// 4. Envia TODOS os comandos de uma só vez (Bulk Overwrite)
+	fmt.Printf("Enviando lote com %d comandos para o Discord...\n", len(allCommands))
+	_, err := s.ApplicationCommandBulkOverwrite(s.State.User.ID, "", allCommands)
+
+	if err != nil {
+		fmt.Printf("❌ Erro ao registrar comandos em lote: %v\n", err)
+	} else {
+		fmt.Println("✅ Todos os comandos foram registrados instantaneamente com sucesso!")
 	}
 }

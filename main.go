@@ -7,10 +7,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	bot "pokebot/bot/handlers"
-	commands "pokebot/bot/modules"
-	"pokebot/bot/modules/youtube"
-	"pokebot/utils"
+	bot "darthverde/bot/handlers"
+	commands "darthverde/bot/modules"
+	"darthverde/bot/modules/youtube"
+	"darthverde/utils"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -34,12 +34,13 @@ func main() {
 		return
 	}
 	botName := dg.State.User.Username
-	fmt.Println(botName + " está pronto! Pressione CTRL-C para sair.")
+
 	// Registra os comandos de barra
 	commands.RegisterSlashCommands(dg) // Registra os comandos de barra
 	// Verifica os servidores atuais
 	bot.CheckGuilds(dg)
 	youtube.StartYouTubeMonitor(dg)
+	fmt.Println(botName + " está pronto! Pressione CTRL-C para sair.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc

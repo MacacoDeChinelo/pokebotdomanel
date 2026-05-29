@@ -2,9 +2,9 @@ package youtube
 
 import (
 	"context"
+	"darthverde/database"
+	"darthverde/models"
 	"fmt"
-	"pokebot/database"
-	"pokebot/models"
 
 	"github.com/bwmarrin/discordgo"
 	// Lembre-se de importar o seu pacote models e database aqui
