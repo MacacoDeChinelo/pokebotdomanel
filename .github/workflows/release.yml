@@ -65,3 +65,11 @@ jobs:
             ${{ env.BOT_NAME }}-windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notificar o Discord via Webhook
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -H "Content-Type: application/json" \
+               -d '{"content": "🚀 **Nova Release Publicada!**\nO GitHub Actions acabou de compilar e publicar uma nova versão do bot!\n\n📦 **Baixe aqui:** https://github.com/${{ github.repository }}/releases/latest"}' \
+               $DISCORD_WEBHOOK
