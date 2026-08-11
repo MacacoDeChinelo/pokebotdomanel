@@ -9,6 +9,7 @@ import (
 
 	bot "darthverde/bot/handlers"
 	commands "darthverde/bot/modules"
+	"darthverde/bot/modules/twitch"
 	"darthverde/bot/modules/youtube"
 	"darthverde/utils"
 
@@ -40,6 +41,7 @@ func main() {
 	// Verifica os servidores atuais
 	bot.CheckGuilds(dg)
 	youtube.StartYouTubeMonitor(dg)
+	twitch.StartTwitchMonitor(dg)
 	fmt.Println(botName + " está pronto! Pressione CTRL-C para sair.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)

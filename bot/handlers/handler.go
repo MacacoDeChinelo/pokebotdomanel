@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	commands "darthverde/bot/modules/pokemon"
+	"darthverde/bot/modules/twitch"
 	"darthverde/bot/modules/youtube"
 
 	"github.com/bwmarrin/discordgo"
@@ -69,6 +70,9 @@ func OnSlashCommandCreateHandler(s *discordgo.Session, i *discordgo.InteractionC
 		commands.HandlePokemonSlash(s, i)
 	case "setyoutube":
 		youtube.HandleSetYouTube(s, i)
+	case "settwitch":
+		twitch.HandleSetTwitch(s, i)
+
 	}
 
 }

@@ -2,6 +2,7 @@ package commands
 
 import (
 	pokemon "darthverde/bot/modules/pokemon"
+	"darthverde/bot/modules/twitch"
 	"darthverde/bot/modules/youtube"
 	"fmt"
 
@@ -16,6 +17,7 @@ func RegisterSlashCommands(s *discordgo.Session) {
 	commandGroups := [][]*discordgo.ApplicationCommand{
 		pokemon.GetCommands(),
 		youtube.GetCommands(),
+		twitch.GetCommands(),
 		// Adicione novos módulos aqui no futuro (ex: economia.GetCommands(), musica.GetCommands())
 	}
 	// 3. Junta tudo dentro do nosso array único 'allCommands'
